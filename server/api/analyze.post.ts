@@ -1,4 +1,4 @@
-import { analyzeQuery } from '../services/analyzeService'
+import { analyzeWithCache } from '../services/analyzeOrchestrator'
 import { logger } from '../utils/logger'
 
 export default defineEventHandler(async (event) => {
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    return await analyzeQuery(body.query.trim(), apiKey)
+    return await analyzeWithCache(body.query.trim(), apiKey)
   } catch (err) {
     logger.error('Erreur lors de l\'analyse', {
       handler: 'analyze',
