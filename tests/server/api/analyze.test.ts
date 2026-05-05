@@ -1,11 +1,11 @@
 // @vitest-environment node
-// Le handler est un thin wrapper autour du service.
+// Le handler est un thin wrapper autour de l'orchestrateur.
 // On teste uniquement la validation d'entrée et la délégation.
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-const { mockAnalyzeQuery, mockReadBody } = vi.hoisted(() => {
-  const mockAnalyzeQuery = vi.fn();
-  const mockReadBody     = vi.fn();
+const { mockAnalyzeWithCache, mockReadBody } = vi.hoisted(() => {
+  const mockAnalyzeWithCache = vi.fn();
+  const mockReadBody         = vi.fn();
 
   // Globals Nitro server (pas injectés comme imports dans l'env node)
   (globalThis as Record<string, unknown>).defineEventHandler = (fn: unknown) => fn;
@@ -18,15 +18,15 @@ const { mockAnalyzeQuery, mockReadBody } = vi.hoisted(() => {
     return err;
   };
 
-  return { mockAnalyzeQuery, mockReadBody };
+  return { mockAnalyzeWithCache, mockReadBody };
 });
 
 vi.mock("~/server/utils/logger", () => ({
   logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() },
 }));
 
-vi.mock("~/server/services/analyzeService", () => ({
-  analyzeQuery: mockAnalyzeQuery,
+vi.mock("~/server/services/analyzeOrchestrator", () => ({
+  analyzeWithCache: mockAnalyzeWithCache,
 }));
 
 import handler from "~/server/api/analyze.post";
@@ -40,14 +40,14 @@ describe("POST /api/analyze — validation", () => {
     vi.clearAllMocks();
     process.env = { ...OLD_ENV, ANTHROPIC_API_KEY: "sk-ant-test" };
     mockReadBody.mockResolvedValue({ query: "L'immigration est massive" });
-    mockAnalyzeQuery.mockResolvedValue({ verdict: "NUANCE", score: 55 });
+    mockAnalyzeWithCache.mockResolvedValue({ verdict: "NUANCE", score: 55, fromCache: false });
   });
 
   afterEach(() => { process.env = OLD_ENV; });
 
-  it("délègue au service avec la query et la clé API", async () => {
+  it("délègue à l'orchestrateur avec la query et la clé API", async () => {
     await (handler as CallableFunction)({});
-    expect(mockAnalyzeQuery).toHaveBeenCalledWith(
+    expect(mockAnalyzeWithCache).toHaveBeenCalledWith(
       "L'immigration est massive",
       "sk-ant-test"
     );
@@ -58,7 +58,7 @@ describe("POST /api/analyze — validation", () => {
     await expect((handler as CallableFunction)({})).rejects.toThrow(
       "Clé API Anthropic manquante côté serveur"
     );
-    expect(mockAnalyzeQuery).not.toHaveBeenCalled();
+    expect(mockAnalyzeWithCache).not.toHaveBeenCalled();
   });
 
   it("lève une erreur 400 si la query est vide", async () => {
@@ -66,7 +66,7 @@ describe("POST /api/analyze — validation", () => {
     await expect((handler as CallableFunction)({})).rejects.toThrow(
       "Affirmation manquante"
     );
-    expect(mockAnalyzeQuery).not.toHaveBeenCalled();
+    expect(mockAnalyzeWithCache).not.toHaveBeenCalled();
   });
 
   it("lève une erreur 400 si le body ne contient pas de query", async () => {
@@ -74,17 +74,17 @@ describe("POST /api/analyze — validation", () => {
     await expect((handler as CallableFunction)({})).rejects.toThrow(
       "Affirmation manquante"
     );
-    expect(mockAnalyzeQuery).not.toHaveBeenCalled();
+    expect(mockAnalyzeWithCache).not.toHaveBeenCalled();
   });
 
-  it("trim la query avant de la passer au service", async () => {
+  it("trim la query avant de la passer à l'orchestrateur", async () => {
     mockReadBody.mockResolvedValue({ query: "  immigration  " });
     await (handler as CallableFunction)({});
-    expect(mockAnalyzeQuery).toHaveBeenCalledWith("immigration", "sk-ant-test");
+    expect(mockAnalyzeWithCache).toHaveBeenCalledWith("immigration", "sk-ant-test");
   });
 
-  it("renvoie une erreur 502 générique si le service échoue", async () => {
-    mockAnalyzeQuery.mockRejectedValueOnce(new Error("Service down"));
+  it("renvoie une erreur 502 générique si l'orchestrateur échoue", async () => {
+    mockAnalyzeWithCache.mockRejectedValueOnce(new Error("Service down"));
     await expect((handler as CallableFunction)({})).rejects.toThrow(
       "Erreur lors de l'analyse. Veuillez réessayer."
     );
