@@ -33,6 +33,11 @@
     }
   },
 
+  "history": {
+    "title": "Dernières analyses",
+    "score": "{score}/100"
+  },
+
   "result": {
     "meta": {
       "analyzedAt": "Analysé {time}"
