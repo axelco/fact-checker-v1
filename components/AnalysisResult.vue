@@ -1,0 +1,163 @@
+<template>
+  <div class="flex flex-col gap-4 fade-in">
+
+    <!-- Meta bar -->
+    <div class="flex items-center justify-between flex-wrap gap-3">
+      <span class="text-[11px] font-mono" style="color: var(--color-text-ghost);">
+        {{ $t('result.meta.analyzedAt', { time: timeAgo(analyzedAt) }) }}
+      </span>
+      <FreshnessIndicator :result="result" />
+    </div>
+
+    <!-- Verdict card -->
+    <div
+      class="rounded-2xl p-6 border"
+      :style="{ background: 'var(--color-bg-surface)', borderColor: `${verdict.color}44`, boxShadow: `0 0 40px ${verdict.glow}` }"
+    >
+      <div class="mb-4">
+        <span
+          class="inline-block text-xs font-semibold tracking-widest uppercase font-mono rounded px-3 py-0.5 mb-3 border"
+          :style="{ color: verdict.color, background: `${verdict.color}22`, borderColor: `${verdict.color}55` }"
+        >
+          {{ verdict.label }}
+        </span>
+        <h2 class="text-lg font-light italic leading-relaxed m-0" style="color: var(--color-text-primary);">
+          « {{ result.affirmation_reformulee }} »
+        </h2>
+      </div>
+      <ScoreBar :score="result.score" :color="verdict.color" />
+      <div class="mt-4 pt-4 border-t" style="border-color: var(--color-border-subtle);">
+        <p class="text-sm leading-7 m-0" style="color: var(--color-text-muted);">{{ result.synthese }}</p>
+      </div>
+    </div>
+
+    <!-- Points clés -->
+    <div v-if="result.points_cles?.length">
+      <div class="text-[11px] uppercase tracking-widest font-mono mb-3" style="color: var(--color-text-faint);">
+        {{ $t('result.sections.keyData') }}
+      </div>
+      <div
+        v-for="(point, i) in result.points_cles" :key="i"
+        class="rounded-xl p-4 mb-2 border"
+        style="background: var(--color-bg-muted); border-color: var(--color-border-subtle);"
+      >
+        <div class="flex justify-between items-start gap-3 flex-wrap">
+          <div class="flex-1">
+            <div class="text-[11px] uppercase tracking-widest font-mono mb-1" style="color: var(--color-accent);">
+              {{ point.categorie }}
+            </div>
+            <div class="text-sm leading-relaxed" style="color: var(--color-text-primary);">{{ point.fait }}</div>
+            <div v-if="point.source" class="text-[11px] font-mono mt-1" style="color: var(--color-text-ghost);">
+              {{ $t('result.sections.source', { source: point.source }) }}
+            </div>
+          </div>
+          <div
+            v-if="point.chiffre"
+            class="rounded-lg px-3 py-2 text-center flex-shrink-0 border"
+            style="background: var(--color-bg-surface); border-color: var(--color-border);"
+          >
+            <div class="text-xl font-bold font-mono leading-none" style="color: var(--color-text-primary);">
+              {{ point.chiffre }}
+            </div>
+            <div v-if="point.unite" class="text-[10px] mt-1" style="color: var(--color-text-faint);">
+              {{ point.unite }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contexte comparatif -->
+    <div
+      v-if="result.contexte_comparatif"
+      class="rounded-xl p-5 border"
+      style="background: var(--color-bg-surface); border-color: var(--color-border);"
+    >
+      <div class="text-[11px] uppercase tracking-widest font-mono mb-3" style="color: var(--color-accent);">
+        {{ $t('result.sections.context') }}
+      </div>
+      <p class="text-sm leading-7 m-0" style="color: var(--color-text-muted);">{{ result.contexte_comparatif }}</p>
+    </div>
+
+    <!-- Nuances -->
+    <div
+      v-if="result.nuances?.length"
+      class="rounded-xl p-5 border"
+      style="background: var(--color-bg-surface); border-color: var(--color-border);"
+    >
+      <div class="text-[11px] uppercase tracking-widest font-mono mb-3" style="color: #f59e0b;">
+        {{ $t('result.sections.nuances') }}
+      </div>
+      <div v-for="(nuance, i) in result.nuances" :key="i" class="flex gap-2 items-start mb-1.5">
+        <span class="flex-shrink-0" style="color: #f59e0b;">—</span>
+        <span class="text-sm leading-relaxed" style="color: var(--color-text-muted);">{{ nuance }}</span>
+      </div>
+    </div>
+
+    <!-- Ce que dit vraiment la data -->
+    <div
+      v-if="result.ce_que_dit_vraiment_la_data"
+      class="rounded-xl p-5 border"
+      :style="{ background: `${verdict.color}0d`, borderColor: `${verdict.color}33` }"
+    >
+      <div class="text-[11px] uppercase tracking-widest font-mono mb-3" :style="{ color: verdict.color }">
+        {{ $t('result.sections.dataConclusion') }}
+      </div>
+      <p class="text-sm leading-7 m-0" style="color: var(--color-text-muted);">
+        {{ result.ce_que_dit_vraiment_la_data }}
+      </p>
+    </div>
+
+    <!-- Sources -->
+    <div v-if="result.sources_consultees?.length" class="pt-4 border-t" style="border-color: var(--color-border-subtle);">
+      <div class="text-[11px] uppercase tracking-widest font-mono mb-3" style="color: var(--color-text-ghost);">
+        {{ $t('result.sections.sources') }}
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <span
+          v-for="(source, i) in result.sources_consultees" :key="i"
+          class="text-[11px] font-mono rounded px-2 py-1 border"
+          style="background: var(--color-bg-surface); border-color: var(--color-border); color: var(--color-text-faint);"
+        >
+          {{ source }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Reset -->
+    <div class="text-center pt-2">
+      <button
+        class="rounded-lg px-5 py-2 text-sm border transition-colors cursor-pointer"
+        style="background: transparent; border-color: var(--color-border); color: var(--color-text-ghost); font-family: inherit;"
+        @click="$emit('reset')"
+      >
+        {{ $t('result.reset') }}
+      </button>
+    </div>
+
+  </div>
+</template>
+
+<script setup lang="ts">
+import { VERDICTS } from '~/types/analysis'
+import type { AnalysisResult } from '~/types/analysis'
+
+const { t } = useI18n()
+
+const props = defineProps<{
+  result:     AnalysisResult
+  analyzedAt: string
+}>()
+
+defineEmits<{ reset: [] }>()
+
+const verdict = computed(() => VERDICTS[props.result.verdict] ?? VERDICTS.INCERTAIN)
+
+function timeAgo(iso: string) {
+  const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
+  if (diff < 60)    return t('result.timeAgo.justNow')
+  if (diff < 3600)  return t('result.timeAgo.minutes', { n: Math.floor(diff / 60) })
+  if (diff < 86400) return t('result.timeAgo.hours',   { n: Math.floor(diff / 3600) })
+  return t('result.timeAgo.days', { n: Math.floor(diff / 86400) })
+}
+</script>

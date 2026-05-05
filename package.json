@@ -1,0 +1,34 @@
+{
+  "name": "fact-checker-v1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "db:generate": "prisma generate",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.40.0",
+    "@logtail/node": "^0.5.8",
+    "@nuxtjs/i18n": "^10.3.0",
+    "@prisma/client": "^6.0.0",
+    "nuxt": "^3.16.0"
+  },
+  "devDependencies": {
+    "@nuxt/test-utils": "^4.0.3",
+    "@tailwindcss/vite": "^4.1.0",
+    "happy-dom": "^20.9.0",
+    "prisma": "^6.0.0",
+    "tailwindcss": "^4.1.0",
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.5"
+  }
+}

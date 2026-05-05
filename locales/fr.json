@@ -1,0 +1,68 @@
+{
+  "app": {
+    "name": "Vérificateur de faits",
+    "tagline": "Saisissez une affirmation · Les données parlent d'elles-mêmes"
+  },
+
+  "header": {
+    "nav": {
+      "analyze": "Analyser"
+    }
+  },
+
+  "footer": {
+    "description": "Vérificateur de faits — données publiques · INSEE · Eurostat · ONU",
+    "poweredBy": "Propulsé par Claude"
+  },
+
+  "home": {
+    "input": {
+      "placeholder": "Exemple : l'immigration est massive en France…",
+      "hint": "Entrée pour lancer · Shift+Entrée pour saut de ligne",
+      "submit": "Analyser →",
+      "submitting": "Analyse en cours…"
+    },
+    "steps": {
+      "0": "Analyse de l'affirmation…",
+      "1": "Recherche de données factuelles…",
+      "2": "Croisement des sources…",
+      "3": "Rédaction du rapport…"
+    },
+    "error": {
+      "unexpected": "Erreur inattendue"
+    }
+  },
+
+  "result": {
+    "meta": {
+      "analyzedAt": "Analysé {time}"
+    },
+    "timeAgo": {
+      "justNow": "à l'instant",
+      "minutes": "il y a {n} min",
+      "hours": "il y a {n} h",
+      "days": "il y a {n} j"
+    },
+    "freshness": {
+      "recent": "Données récentes",
+      "lastYear": "Données de l'an dernier",
+      "dated": "Données datées",
+      "old": "Données anciennes",
+      "sourcesUpTo": "Sources jusqu'en {year}",
+      "checkNewer": "Vérifier des sources plus récentes"
+    },
+    "sections": {
+      "keyData": "Données clés",
+      "source": "Source : {source}",
+      "context": "◈ Contexte & comparaisons",
+      "nuances": "⚑ Nuances importantes",
+      "dataConclusion": "→ Ce que disent vraiment les données",
+      "sources": "Sources consultées"
+    },
+    "score": {
+      "label": "Score factuel",
+      "value": "{score}/100"
+    },
+    "reset": "← Nouvelle affirmation"
+  }
+}

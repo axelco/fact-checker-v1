@@ -1,0 +1,19 @@
+# Nuxt
+.nuxt
+.output
+dist
+
+# Env — NEVER commit
+.env
+.env.local
+
+# Node
+node_modules
+
+# Logs
+logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
