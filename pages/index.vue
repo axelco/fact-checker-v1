@@ -88,6 +88,13 @@
       @reset="reset"
     />
 
+    <!-- History -->
+    <SearchHistory
+      v-if="!result && !loading"
+      :entries="history"
+      @select="restoreFromHistory"
+    />
+
   </div>
 </template>
 
@@ -103,6 +110,9 @@ const analyzedAt  = ref<string | null>(null)
 const error       = ref<string | null>(null)
 const loadingStep = ref(0)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
+
+const { history, load: loadHistory, push: pushHistory } = useSearchHistory()
+onMounted(loadHistory)
 
 const submitStyle = computed(() => {
   const disabled = !query.value.trim() || loading.value
@@ -149,8 +159,16 @@ async function analyze() {
       method: 'POST',
       body:   { query: query.value.trim() },
     })
+    const now        = new Date().toISOString()
     result.value     = data
-    analyzedAt.value = new Date().toISOString()
+    analyzedAt.value = now
+    pushHistory({
+      query:      query.value.trim(),
+      verdict:    data.verdict,
+      score:      data.score,
+      analyzedAt: now,
+      result:     data,
+    })
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : t('home.error.unexpected')
     error.value = msg
@@ -165,5 +183,12 @@ function reset() {
   error.value      = null
   query.value      = ''
   nextTick(() => textareaRef.value?.focus())
+}
+
+function restoreFromHistory(entry: { result: AnalysisResultType; analyzedAt: string; query: string }) {
+  result.value     = entry.result
+  analyzedAt.value = entry.analyzedAt
+  query.value      = entry.query
+  error.value      = null
 }
 </script>
