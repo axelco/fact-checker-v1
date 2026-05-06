@@ -2,6 +2,7 @@ import type { AnalysisResult } from '~/types/analysis'
 
 export type HistoryEntry = {
   id:          string
+  analysisId?: string
   query:       string
   verdict:     string
   score:       number

@@ -27,3 +27,7 @@ export async function incrementHitCount(id: string) {
     data:  { hitCount: { increment: 1 } },
   })
 }
+
+export async function findById(id: string) {
+  return prisma.analysis.findUnique({ where: { id } })
+}

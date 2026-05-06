@@ -73,20 +73,47 @@
     <!-- Result -->
     <AnalysisResult
       v-if="result && analyzedAt && !loading"
-      ref="analysisResultRef"
       :result="result"
       :analyzed-at="analyzedAt"
-      @reset="reset"
     />
 
-    <!-- Floating reset button -->
+    <!-- Natural action bar (in document flow) -->
+    <div
+      v-if="result && !loading"
+      ref="actionBarRef"
+      class="flex justify-center gap-3 pt-2 pb-2"
+    >
+      <button
+        v-if="analysisId"
+        class="btn btn-lg btn-secondary"
+        @click="copyShareUrl"
+      >
+        <span>{{ copied ? '✓' : '⎘' }}</span>
+        <span class="hidden sm:inline">{{ copied ? $t('share.copied') : $t('share.copy') }}</span>
+      </button>
+      <button class="btn btn-lg btn-primary" @click="reset">
+        <span>←</span>
+        <span class="hidden sm:inline">{{ $t('result.reset') }}</span>
+      </button>
+    </div>
+
+    <!-- Fixed action bar (only when natural bar is out of viewport) -->
     <Teleport to="body">
       <div
-        v-if="result && !loading && !nativeResetVisible"
-        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 fade-in"
+        v-if="result && !loading && !actionBarVisible"
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 fade-in flex gap-3"
       >
+        <button
+          v-if="analysisId"
+          class="btn btn-lg btn-secondary shadow-lg"
+          @click="copyShareUrl"
+        >
+          <span>{{ copied ? '✓' : '⎘' }}</span>
+          <span class="hidden sm:inline">{{ copied ? $t('share.copied') : $t('share.copy') }}</span>
+        </button>
         <button class="btn btn-lg btn-primary shadow-lg" @click="reset">
-          {{ $t('result.reset') }}
+          <span>←</span>
+          <span class="hidden sm:inline">{{ $t('result.reset') }}</span>
         </button>
       </div>
     </Teleport>
@@ -102,45 +129,45 @@
 </template>
 
 <script setup lang="ts">
-import AnalysisResult from '~/components/AnalysisResult.vue'
-import type { AnalysisResult as AnalysisResultType } from '~/types/analysis'
+import type { AnalysisResult as AnalysisResultType, ApiAnalyzeResponse } from '~/types/analysis'
 
 const { t } = useI18n()
 
-const query             = ref('')
-const loading           = ref(false)
-const result            = ref<AnalysisResultType | null>(null)
-const analyzedAt        = ref<string | null>(null)
-const error             = ref<string | null>(null)
-const loadingStep       = ref(0)
-const textareaRef       = ref<HTMLTextAreaElement | null>(null)
-const analysisResultRef = ref<InstanceType<typeof AnalysisResult> | null>(null)
-const nativeResetVisible = ref(false)
+const query            = ref('')
+const loading          = ref(false)
+const result           = ref<AnalysisResultType | null>(null)
+const analyzedAt       = ref<string | null>(null)
+const analysisId       = ref<string | null>(null)
+const error            = ref<string | null>(null)
+const copied           = ref(false)
+const loadingStep      = ref(0)
+const textareaRef      = ref<HTMLTextAreaElement | null>(null)
+const actionBarRef     = ref<HTMLElement | null>(null)
+const actionBarVisible = ref(false)
 
-let resetObserver: IntersectionObserver | null = null
+let actionBarObserver: IntersectionObserver | null = null
 
-function setupResetObserver() {
-  resetObserver?.disconnect()
+function setupActionBarObserver() {
+  actionBarObserver?.disconnect()
   nextTick(() => {
-    const el = analysisResultRef.value?.resetSection
-    if (!el) return
-    resetObserver = new IntersectionObserver(([entry]) => {
-      nativeResetVisible.value = entry.isIntersecting
+    if (!actionBarRef.value) return
+    actionBarObserver = new IntersectionObserver(([entry]) => {
+      actionBarVisible.value = entry.isIntersecting
     }, { threshold: 0.5 })
-    resetObserver.observe(el)
+    actionBarObserver.observe(actionBarRef.value)
   })
 }
 
 watch(result, (val) => {
   if (val) {
-    setupResetObserver()
+    setupActionBarObserver()
   } else {
-    resetObserver?.disconnect()
-    nativeResetVisible.value = false
+    actionBarObserver?.disconnect()
+    actionBarVisible.value = false
   }
 })
 
-onUnmounted(() => resetObserver?.disconnect())
+onUnmounted(() => actionBarObserver?.disconnect())
 
 const { history, load: loadHistory, push: pushHistory } = useSearchHistory()
 onMounted(loadHistory)
@@ -177,14 +204,16 @@ async function analyze() {
   error.value   = null
 
   try {
-    const data = await $fetch<AnalysisResultType>('/api/analyze', {
+    const data = await $fetch<ApiAnalyzeResponse>('/api/analyze', {
       method: 'POST',
       body:   { query: query.value.trim() },
     })
     const now        = new Date().toISOString()
     result.value     = data
+    analysisId.value = data.id ?? null
     analyzedAt.value = now
     pushHistory({
+      analysisId: data.id,
       query:      query.value.trim(),
       verdict:    data.verdict,
       score:      data.score,
@@ -202,14 +231,28 @@ async function analyze() {
 function reset() {
   result.value     = null
   analyzedAt.value = null
+  analysisId.value = null
   error.value      = null
+  copied.value     = false
   query.value      = ''
   nextTick(() => textareaRef.value?.focus())
 }
 
-function restoreFromHistory(entry: { result: AnalysisResultType; analyzedAt: string; query: string }) {
+let copiedTimer: ReturnType<typeof setTimeout> | null = null
+
+async function copyShareUrl() {
+  if (!analysisId.value) return
+  const url = `${window.location.origin}/analysis/${analysisId.value}`
+  await navigator.clipboard.writeText(url)
+  copied.value = true
+  if (copiedTimer) clearTimeout(copiedTimer)
+  copiedTimer = setTimeout(() => { copied.value = false }, 2000)
+}
+
+function restoreFromHistory(entry: { result: AnalysisResultType; analyzedAt: string; query: string; analysisId?: string }) {
   result.value     = entry.result
   analyzedAt.value = entry.analyzedAt
+  analysisId.value = entry.analysisId ?? null
   query.value      = entry.query
   error.value      = null
 }
