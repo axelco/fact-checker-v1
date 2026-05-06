@@ -1,18 +1,17 @@
 <template>
   <div
     v-if="maxYear"
-    class="flex items-center gap-2 rounded-lg px-3 py-2 border text-xs"
-    :style="{ background: 'var(--color-bg-muted)', borderColor: `${color}33` }"
+    class="flex items-center gap-2 rounded-lg px-3 py-2 border text-xs bg-dim"
+    :style="{ borderColor: `${color}33` }"
   >
     <span class="w-2 h-2 rounded-full flex-shrink-0" :style="{ background: color }" />
     <span class="font-semibold font-mono" :style="{ color }">{{ label }}</span>
-    <span class="font-mono" style="color: var(--color-text-ghost);">
+    <span class="font-mono text-ghost">
       {{ $t('result.freshness.sourcesUpTo', { year: maxYear }) }}
     </span>
     <span
       v-if="age >= 2"
-      class="ml-auto px-1.5 py-0.5 rounded text-[11px] font-mono whitespace-nowrap border"
-      style="color: #f59e0b; background: #f59e0b15; border-color: #f59e0b33;"
+      class="ml-auto px-1.5 py-0.5 rounded text-[11px] font-mono whitespace-nowrap border text-amber-500 bg-amber-500/10 border-amber-500/20"
     >
       {{ $t('result.freshness.checkNewer') }}
     </span>

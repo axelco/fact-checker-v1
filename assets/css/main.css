@@ -1,23 +1,76 @@
 @import "tailwindcss";
 
-/* Custom design tokens – dark blue palette du proto */
-:root {
-  --color-bg-base:    #020c1b;
-  --color-bg-surface: #0d1f35;
-  --color-bg-muted:   #0a1628;
-  --color-border:     #1e3a5f;
-  --color-border-subtle: #1e293b;
-  --color-accent:     #38bdf8;
-  --color-text-primary: #e2e8f0;
-  --color-text-muted:   #94a3b8;
-  --color-text-faint:   #475569;
-  --color-text-ghost:   #334155;
+@theme {
+  /* Backgrounds */
+  --color-canvas:  #0e0d1f;
+  --color-surface: #100f22;
+  --color-dim:     #16133a;
+
+  /* Borders */
+  --color-line:        #333059;
+  --color-line-subtle: #312e81;
+
+  /* Accent */
+  --color-accent: #818cf8;
+
+  /* Text */
+  --color-primary:   #e0e7ff;
+  --color-muted:     #a5b4fc;
+  --color-faint:     #6366f1;
+  --color-ghost:     #636e9e;
+
+  /* Buttons */
+  --color-btn-primary:       #6366f1;
+  --color-btn-primary-hover: #818cf8;
+  --color-btn-primary-disabled-bg:   #312e81;
+  --color-btn-primary-disabled-text: #6366f1;
+
+  --color-btn-secondary:       #4338ca;
+  --color-btn-secondary-hover: #4f46e5;
 }
 
 html {
-  background-color: var(--color-bg-base);
-  color: var(--color-text-primary);
-  font-family: 'Georgia', 'Times New Roman', serif;
+  background-color: var(--color-canvas);
+  color: var(--color-primary);
+  font-family: 'Calibri', 'Times New Roman', serif;
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2;
+    @apply px-5 py-2 text-sm font-semibold;
+    @apply rounded-lg border-none;
+    @apply transition-all duration-200 cursor-pointer;
+    @apply disabled:cursor-not-allowed;
+    font-family: inherit;
+  }
+
+  .btn-sm { @apply px-3 py-1.5 text-xs; }
+  .btn-lg { @apply px-6 py-3 text-base; }
+
+  .btn-primary {
+    @apply bg-btn-primary text-white;
+
+    &:hover:not(:disabled) {
+      @apply bg-btn-primary-hover;
+    }
+
+    &:disabled {
+      @apply bg-btn-primary-disabled-bg text-btn-primary-disabled-text;
+    }
+  }
+
+  .btn-secondary {
+    @apply bg-btn-secondary text-white;
+
+    &:hover:not(:disabled) {
+      @apply bg-btn-secondary-hover;
+    }
+
+    &:disabled {
+      @apply opacity-50;
+    }
+  }
 }
 
 @keyframes spin {

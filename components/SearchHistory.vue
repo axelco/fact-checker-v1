@@ -1,14 +1,14 @@
 <template>
   <div v-if="entries.length" class="mt-10">
-    <div class="text-[11px] uppercase tracking-widest font-mono mb-4" style="color: var(--color-text-faint);">
+    <div class="text-[11px] uppercase tracking-widest font-mono mb-4 text-faint">
       {{ $t('history.title') }}
     </div>
     <div class="flex flex-col gap-2">
       <button
         v-for="entry in entries"
         :key="entry.id"
-        class="w-full text-left rounded-xl px-4 py-3 border transition-colors duration-150 cursor-pointer"
-        style="background: var(--color-bg-surface); border-color: var(--color-border); font-family: inherit;"
+        class="w-full text-left rounded-xl px-4 py-3 border transition-colors duration-150 cursor-pointer bg-surface border-line"
+        style="font-family: inherit;"
         @click="$emit('select', entry)"
       >
         <div class="flex items-center justify-between gap-3 flex-wrap">
@@ -19,15 +19,15 @@
             >
               {{ verdictLabel(entry.verdict) }}
             </span>
-            <span class="text-sm truncate" style="color: var(--color-text-muted);">
+            <span class="text-sm truncate text-muted">
               {{ entry.query }}
             </span>
           </div>
           <div class="flex items-center gap-3 flex-shrink-0">
-            <span class="text-xs font-mono" style="color: var(--color-text-ghost);">
+            <span class="text-xs font-mono text-ghost">
               {{ $t('history.score', { score: entry.score }) }}
             </span>
-            <span class="text-[11px] font-mono" style="color: var(--color-border-subtle);">
+            <span class="text-[11px] font-mono text-line-subtle">
               {{ timeAgo(entry.analyzedAt) }}
             </span>
           </div>
