@@ -3,7 +3,7 @@
 
     <!-- Meta bar -->
     <div class="flex items-center justify-between flex-wrap gap-3">
-      <span class="text-[11px] font-mono" style="color: var(--color-text-ghost);">
+      <span class="text-[11px] font-mono text-ghost">
         {{ $t('result.meta.analyzedAt', { time: timeAgo(analyzedAt) }) }}
       </span>
       <FreshnessIndicator :result="result" />
@@ -11,8 +11,8 @@
 
     <!-- Verdict card -->
     <div
-      class="rounded-2xl p-6 border"
-      :style="{ background: 'var(--color-bg-surface)', borderColor: `${verdict.color}44`, boxShadow: `0 0 40px ${verdict.glow}` }"
+      class="rounded-2xl p-6 border bg-surface"
+      :style="{ borderColor: `${verdict.color}44`, boxShadow: `0 0 40px ${verdict.glow}` }"
     >
       <div class="mb-4">
         <span
@@ -21,45 +21,43 @@
         >
           {{ verdict.label }}
         </span>
-        <h2 class="text-lg font-light italic leading-relaxed m-0" style="color: var(--color-text-primary);">
+        <h2 class="text-lg font-light italic leading-relaxed m-0 text-primary">
           « {{ result.affirmation_reformulee }} »
         </h2>
       </div>
       <ScoreBar :score="result.score" :color="verdict.color" />
-      <div class="mt-4 pt-4 border-t" style="border-color: var(--color-border-subtle);">
-        <p class="text-sm leading-7 m-0" style="color: var(--color-text-muted);">{{ result.synthese }}</p>
+      <div class="mt-4 pt-4 border-t border-line-subtle">
+        <p class="text-sm leading-7 m-0 text-muted">{{ result.synthese }}</p>
       </div>
     </div>
 
     <!-- Points clés -->
     <div v-if="result.points_cles?.length">
-      <div class="text-[11px] uppercase tracking-widest font-mono mb-3" style="color: var(--color-text-faint);">
+      <div class="text-[11px] uppercase tracking-widest font-mono mb-3 text-faint">
         {{ $t('result.sections.keyData') }}
       </div>
       <div
         v-for="(point, i) in result.points_cles" :key="i"
-        class="rounded-xl p-4 mb-2 border"
-        style="background: var(--color-bg-muted); border-color: var(--color-border-subtle);"
+        class="rounded-xl p-4 mb-2 border bg-dim border-line-subtle"
       >
         <div class="flex justify-between items-start gap-3 flex-wrap">
           <div class="flex-1">
-            <div class="text-[11px] uppercase tracking-widest font-mono mb-1" style="color: var(--color-accent);">
+            <div class="text-[11px] uppercase tracking-widest font-mono mb-1 text-accent">
               {{ point.categorie }}
             </div>
-            <div class="text-sm leading-relaxed" style="color: var(--color-text-primary);">{{ point.fait }}</div>
-            <div v-if="point.source" class="text-[11px] font-mono mt-1" style="color: var(--color-text-ghost);">
+            <div class="text-sm leading-relaxed text-primary">{{ point.fait }}</div>
+            <div v-if="point.source" class="text-[11px] font-mono mt-1 text-ghost">
               {{ $t('result.sections.source', { source: point.source }) }}
             </div>
           </div>
           <div
             v-if="point.chiffre"
-            class="rounded-lg px-3 py-2 text-center flex-shrink-0 border"
-            style="background: var(--color-bg-surface); border-color: var(--color-border);"
+            class="rounded-lg px-3 py-2 text-center flex-shrink-0 border bg-surface border-line"
           >
-            <div class="text-xl font-bold font-mono leading-none" style="color: var(--color-text-primary);">
+            <div class="text-xl font-bold font-mono leading-none text-primary">
               {{ point.chiffre }}
             </div>
-            <div v-if="point.unite" class="text-[10px] mt-1" style="color: var(--color-text-faint);">
+            <div v-if="point.unite" class="text-[10px] mt-1 text-faint">
               {{ point.unite }}
             </div>
           </div>
@@ -70,27 +68,25 @@
     <!-- Contexte comparatif -->
     <div
       v-if="result.contexte_comparatif"
-      class="rounded-xl p-5 border"
-      style="background: var(--color-bg-surface); border-color: var(--color-border);"
+      class="rounded-xl p-5 border bg-surface border-line"
     >
-      <div class="text-[11px] uppercase tracking-widest font-mono mb-3" style="color: var(--color-accent);">
+      <div class="text-[11px] uppercase tracking-widest font-mono mb-3 text-accent">
         {{ $t('result.sections.context') }}
       </div>
-      <p class="text-sm leading-7 m-0" style="color: var(--color-text-muted);">{{ result.contexte_comparatif }}</p>
+      <p class="text-sm leading-7 m-0 text-muted">{{ result.contexte_comparatif }}</p>
     </div>
 
     <!-- Nuances -->
     <div
       v-if="result.nuances?.length"
-      class="rounded-xl p-5 border"
-      style="background: var(--color-bg-surface); border-color: var(--color-border);"
+      class="rounded-xl p-5 border bg-surface border-line"
     >
-      <div class="text-[11px] uppercase tracking-widest font-mono mb-3" style="color: #f59e0b;">
+      <div class="text-[11px] uppercase tracking-widest font-mono mb-3 text-amber-500">
         {{ $t('result.sections.nuances') }}
       </div>
       <div v-for="(nuance, i) in result.nuances" :key="i" class="flex gap-2 items-start mb-1.5">
-        <span class="flex-shrink-0" style="color: #f59e0b;">—</span>
-        <span class="text-sm leading-relaxed" style="color: var(--color-text-muted);">{{ nuance }}</span>
+        <span class="flex-shrink-0 text-amber-500">—</span>
+        <span class="text-sm leading-relaxed text-muted">{{ nuance }}</span>
       </div>
     </div>
 
@@ -103,21 +99,20 @@
       <div class="text-[11px] uppercase tracking-widest font-mono mb-3" :style="{ color: verdict.color }">
         {{ $t('result.sections.dataConclusion') }}
       </div>
-      <p class="text-sm leading-7 m-0" style="color: var(--color-text-muted);">
+      <p class="text-sm leading-7 m-0 text-muted">
         {{ result.ce_que_dit_vraiment_la_data }}
       </p>
     </div>
 
     <!-- Sources -->
-    <div v-if="result.sources_consultees?.length" class="pt-4 border-t" style="border-color: var(--color-border-subtle);">
-      <div class="text-[11px] uppercase tracking-widest font-mono mb-3" style="color: var(--color-text-ghost);">
+    <div v-if="result.sources_consultees?.length" class="pt-4 border-t border-line-subtle">
+      <div class="text-[11px] uppercase tracking-widest font-mono mb-3 text-ghost">
         {{ $t('result.sections.sources') }}
       </div>
       <div class="flex flex-wrap gap-2">
         <span
           v-for="(source, i) in result.sources_consultees" :key="i"
-          class="text-[11px] font-mono rounded px-2 py-1 border"
-          style="background: var(--color-bg-surface); border-color: var(--color-border); color: var(--color-text-faint);"
+          class="text-[11px] font-mono rounded px-2 py-1 border bg-surface border-line text-faint"
         >
           {{ source }}
         </span>
@@ -127,8 +122,7 @@
     <!-- Reset -->
     <div class="text-center pt-2">
       <button
-        class="rounded-lg px-5 py-2 text-sm border transition-colors cursor-pointer"
-        style="background: transparent; border-color: var(--color-border); color: var(--color-text-ghost); font-family: inherit;"
+        class="btn btn-lg btn-primary"
         @click="$emit('reset')"
       >
         {{ $t('result.reset') }}

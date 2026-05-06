@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex flex-col" style="background-color: var(--color-bg-base);">
+  <div class="min-h-screen flex flex-col bg-canvas">
     <AppHeader />
 
     <main class="flex-1 w-full">
