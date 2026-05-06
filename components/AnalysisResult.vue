@@ -120,7 +120,7 @@
     </div>
 
     <!-- Reset -->
-    <div class="text-center pt-2">
+    <div ref="resetSection" class="text-center pt-2">
       <button
         class="btn btn-lg btn-primary"
         @click="$emit('reset')"
@@ -137,6 +137,9 @@ import { VERDICTS } from '~/types/analysis'
 import type { AnalysisResult } from '~/types/analysis'
 
 const { t } = useI18n()
+
+const resetSection = ref<HTMLElement | null>(null)
+defineExpose({ resetSection })
 
 const props = defineProps<{
   result:     AnalysisResult

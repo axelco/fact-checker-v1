@@ -73,10 +73,23 @@
     <!-- Result -->
     <AnalysisResult
       v-if="result && analyzedAt && !loading"
+      ref="analysisResultRef"
       :result="result"
       :analyzed-at="analyzedAt"
       @reset="reset"
     />
+
+    <!-- Floating reset button -->
+    <Teleport to="body">
+      <div
+        v-if="result && !loading && !nativeResetVisible"
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 fade-in"
+      >
+        <button class="btn btn-lg btn-primary shadow-lg" @click="reset">
+          {{ $t('result.reset') }}
+        </button>
+      </div>
+    </Teleport>
 
     <!-- History -->
     <SearchHistory
@@ -89,17 +102,45 @@
 </template>
 
 <script setup lang="ts">
+import AnalysisResult from '~/components/AnalysisResult.vue'
 import type { AnalysisResult as AnalysisResultType } from '~/types/analysis'
 
 const { t } = useI18n()
 
-const query       = ref('')
-const loading     = ref(false)
-const result      = ref<AnalysisResultType | null>(null)
-const analyzedAt  = ref<string | null>(null)
-const error       = ref<string | null>(null)
-const loadingStep = ref(0)
-const textareaRef = ref<HTMLTextAreaElement | null>(null)
+const query             = ref('')
+const loading           = ref(false)
+const result            = ref<AnalysisResultType | null>(null)
+const analyzedAt        = ref<string | null>(null)
+const error             = ref<string | null>(null)
+const loadingStep       = ref(0)
+const textareaRef       = ref<HTMLTextAreaElement | null>(null)
+const analysisResultRef = ref<InstanceType<typeof AnalysisResult> | null>(null)
+const nativeResetVisible = ref(false)
+
+let resetObserver: IntersectionObserver | null = null
+
+function setupResetObserver() {
+  resetObserver?.disconnect()
+  nextTick(() => {
+    const el = analysisResultRef.value?.resetSection
+    if (!el) return
+    resetObserver = new IntersectionObserver(([entry]) => {
+      nativeResetVisible.value = entry.isIntersecting
+    }, { threshold: 0.5 })
+    resetObserver.observe(el)
+  })
+}
+
+watch(result, (val) => {
+  if (val) {
+    setupResetObserver()
+  } else {
+    resetObserver?.disconnect()
+    nativeResetVisible.value = false
+  }
+})
+
+onUnmounted(() => resetObserver?.disconnect())
 
 const { history, load: loadHistory, push: pushHistory } = useSearchHistory()
 onMounted(loadHistory)
