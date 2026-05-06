@@ -77,46 +77,12 @@
       :analyzed-at="analyzedAt"
     />
 
-    <!-- Natural action bar (in document flow) -->
-    <div
+    <!-- Action bar -->
+    <AnalysisActionBar
       v-if="result && !loading"
-      ref="actionBarRef"
-      class="flex justify-center gap-3 pt-2 pb-2"
-    >
-      <button
-        v-if="analysisId"
-        class="btn btn-lg btn-secondary"
-        @click="copyShareUrl"
-      >
-        <span>{{ copied ? '✓' : '⎘' }}</span>
-        <span class="hidden sm:inline">{{ copied ? $t('share.copied') : $t('share.copy') }}</span>
-      </button>
-      <button class="btn btn-lg btn-primary" @click="reset">
-        <span>←</span>
-        <span class="hidden sm:inline">{{ $t('result.reset') }}</span>
-      </button>
-    </div>
-
-    <!-- Fixed action bar (only when natural bar is out of viewport) -->
-    <Teleport to="body">
-      <div
-        v-if="result && !loading && !actionBarVisible"
-        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 fade-in flex gap-3"
-      >
-        <button
-          v-if="analysisId"
-          class="btn btn-lg btn-secondary shadow-lg"
-          @click="copyShareUrl"
-        >
-          <span>{{ copied ? '✓' : '⎘' }}</span>
-          <span class="hidden sm:inline">{{ copied ? $t('share.copied') : $t('share.copy') }}</span>
-        </button>
-        <button class="btn btn-lg btn-primary shadow-lg" @click="reset">
-          <span>←</span>
-          <span class="hidden sm:inline">{{ $t('result.reset') }}</span>
-        </button>
-      </div>
-    </Teleport>
+      :analysis-id="analysisId"
+      @reset="reset"
+    />
 
     <!-- History -->
     <SearchHistory
@@ -133,41 +99,14 @@ import type { AnalysisResult as AnalysisResultType, ApiAnalyzeResponse } from '~
 
 const { t } = useI18n()
 
-const query            = ref('')
-const loading          = ref(false)
-const result           = ref<AnalysisResultType | null>(null)
-const analyzedAt       = ref<string | null>(null)
-const analysisId       = ref<string | null>(null)
-const error            = ref<string | null>(null)
-const copied           = ref(false)
-const loadingStep      = ref(0)
-const textareaRef      = ref<HTMLTextAreaElement | null>(null)
-const actionBarRef     = ref<HTMLElement | null>(null)
-const actionBarVisible = ref(false)
-
-let actionBarObserver: IntersectionObserver | null = null
-
-function setupActionBarObserver() {
-  actionBarObserver?.disconnect()
-  nextTick(() => {
-    if (!actionBarRef.value) return
-    actionBarObserver = new IntersectionObserver(([entry]) => {
-      actionBarVisible.value = entry.isIntersecting
-    }, { threshold: 0.5 })
-    actionBarObserver.observe(actionBarRef.value)
-  })
-}
-
-watch(result, (val) => {
-  if (val) {
-    setupActionBarObserver()
-  } else {
-    actionBarObserver?.disconnect()
-    actionBarVisible.value = false
-  }
-})
-
-onUnmounted(() => actionBarObserver?.disconnect())
+const query       = ref('')
+const loading     = ref(false)
+const result      = ref<AnalysisResultType | null>(null)
+const analyzedAt  = ref<string | null>(null)
+const analysisId  = ref<string | null>(null)
+const error       = ref<string | null>(null)
+const loadingStep = ref(0)
+const textareaRef = ref<HTMLTextAreaElement | null>(null)
 
 const { history, load: loadHistory, push: pushHistory } = useSearchHistory()
 onMounted(loadHistory)
@@ -233,20 +172,8 @@ function reset() {
   analyzedAt.value = null
   analysisId.value = null
   error.value      = null
-  copied.value     = false
   query.value      = ''
   nextTick(() => textareaRef.value?.focus())
-}
-
-let copiedTimer: ReturnType<typeof setTimeout> | null = null
-
-async function copyShareUrl() {
-  if (!analysisId.value) return
-  const url = `${window.location.origin}/analysis/${analysisId.value}`
-  await navigator.clipboard.writeText(url)
-  copied.value = true
-  if (copiedTimer) clearTimeout(copiedTimer)
-  copiedTimer = setTimeout(() => { copied.value = false }, 2000)
 }
 
 function restoreFromHistory(entry: { result: AnalysisResultType; analyzedAt: string; query: string; analysisId?: string }) {

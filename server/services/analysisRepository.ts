@@ -31,3 +31,36 @@ export async function incrementHitCount(id: string) {
 export async function findById(id: string) {
   return prisma.analysis.findUnique({ where: { id } })
 }
+
+export async function findPaginated(opts: {
+  page:     number
+  limit:    number
+  sort:     'recent' | 'popular'
+  verdict?: string
+}) {
+  const where    = opts.verdict ? { verdict: opts.verdict } : {}
+  const orderBy  = opts.sort === 'popular'
+    ? { hitCount: 'desc' as const }
+    : { updatedAt: 'desc' as const }
+
+  const [items, total] = await Promise.all([
+    prisma.analysis.findMany({
+      where,
+      orderBy,
+      skip:   (opts.page - 1) * opts.limit,
+      take:   opts.limit,
+      select: {
+        id:            true,
+        originalQuery: true,
+        verdict:       true,
+        score:         true,
+        hitCount:      true,
+        createdAt:     true,
+        updatedAt:     true,
+      },
+    }),
+    prisma.analysis.count({ where }),
+  ])
+
+  return { items, total, page: opts.page, totalPages: Math.ceil(total / opts.limit) }
+}

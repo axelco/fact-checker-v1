@@ -11,10 +11,17 @@
       <nav class="flex items-center gap-6">
         <NuxtLink
           to="/"
-          class="text-sm  transition-colors text-faint"
-          active-class="active"
+          class="text-sm transition-colors text-faint"
+          active-class="!text-primary"
         >
           {{ $t('header.nav.analyze') }}
+        </NuxtLink>
+        <NuxtLink
+          to="/analyses"
+          class="text-sm transition-colors text-faint"
+          active-class="!text-primary"
+        >
+          {{ $t('header.nav.analyses') }}
         </NuxtLink>
       </nav>
     </div>
