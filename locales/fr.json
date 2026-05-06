@@ -38,6 +38,17 @@
     "score": "{score}/100"
   },
 
+  "analysis": {
+    "error": "Cette analyse est introuvable ou a expiré.",
+    "backHome": "Retour à l'accueil",
+    "newAnalysis": "← Nouvelle affirmation"
+  },
+
+  "share": {
+    "copy": "⎘ Copier le lien",
+    "copied": "✓ Lien copié !"
+  },
+
   "result": {
     "meta": {
       "analyzedAt": "Analysé {time}"

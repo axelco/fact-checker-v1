@@ -105,7 +105,7 @@
     </div>
 
     <!-- Sources -->
-    <div v-if="result.sources_consultees?.length" class="pt-4 border-t border-line-subtle">
+    <div v-if="result.sources_consultees?.length" class="py-4 border-t border-line-subtle">
       <div class="text-[11px] uppercase tracking-widest font-mono mb-3 text-ghost">
         {{ $t('result.sections.sources') }}
       </div>
@@ -119,16 +119,6 @@
       </div>
     </div>
 
-    <!-- Reset -->
-    <div ref="resetSection" class="text-center pt-2">
-      <button
-        class="btn btn-lg btn-primary"
-        @click="$emit('reset')"
-      >
-        {{ $t('result.reset') }}
-      </button>
-    </div>
-
   </div>
 </template>
 
@@ -138,15 +128,10 @@ import type { AnalysisResult } from '~/types/analysis'
 
 const { t } = useI18n()
 
-const resetSection = ref<HTMLElement | null>(null)
-defineExpose({ resetSection })
-
 const props = defineProps<{
   result:     AnalysisResult
   analyzedAt: string
 }>()
-
-defineEmits<{ reset: [] }>()
 
 const verdict = computed(() => VERDICTS[props.result.verdict] ?? VERDICTS.INCERTAIN)
 
