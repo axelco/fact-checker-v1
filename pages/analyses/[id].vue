@@ -30,16 +30,7 @@
         :analyzed-at="data.createdAt"
       />
 
-      <div class="flex justify-center gap-3 mt-6">
-        <button class="btn btn-lg btn-secondary" @click="copyShareUrl">
-          <span>{{ copied ? '✓' : '⎘' }}</span>
-          <span class="hidden sm:inline">{{ copied ? $t('share.copied') : $t('share.copy') }}</span>
-        </button>
-        <NuxtLink to="/" class="btn btn-lg btn-primary">
-          <span>←</span>
-          <span class="hidden sm:inline">{{ $t('analysis.newAnalysis') }}</span>
-        </NuxtLink>
-      </div>
+      <AnalysisActionBar :analysis-id="data.id" @reset="navigateTo('/')" />
     </template>
 
   </div>
@@ -48,17 +39,8 @@
 <script setup lang="ts">
 import type { AnalysisResult } from '~/types/analysis'
 
-const route  = useRoute()
-const id     = route.params.id as string
-const copied = ref(false)
-let copiedTimer: ReturnType<typeof setTimeout> | null = null
-
-async function copyShareUrl() {
-  await navigator.clipboard.writeText(window.location.href)
-  copied.value = true
-  if (copiedTimer) clearTimeout(copiedTimer)
-  copiedTimer = setTimeout(() => { copied.value = false }, 2000)
-}
+const route = useRoute()
+const id    = route.params.id as string
 
 const { data, pending, error } = await useAsyncData(
   `analysis-${id}`,

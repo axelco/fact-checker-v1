@@ -6,8 +6,22 @@
 
   "header": {
     "nav": {
-      "analyze": "Analyser"
+      "analyze":  "Analyser",
+      "analyses": "Toutes les analyses"
     }
+  },
+
+  "analyses": {
+    "title":  "Toutes les analyses",
+    "total":  "{n} résultat(s)",
+    "empty":      "Aucune analyse trouvée.",
+    "popular":    "Populaire",
+    "see":        "Voir →",
+    "sort": {
+      "recent":   "Plus récentes",
+      "popular":  "Plus populaires"
+    },
+    "pagination": "Page {page} / {total}"
   },
 
   "footer": {
@@ -41,12 +55,12 @@
   "analysis": {
     "error": "Cette analyse est introuvable ou a expiré.",
     "backHome": "Retour à l'accueil",
-    "newAnalysis": "← Nouvelle affirmation"
+    "newAnalysis": "Nouvelle affirmation"
   },
 
   "share": {
-    "copy": "⎘ Copier le lien",
-    "copied": "✓ Lien copié !"
+    "copy":   "Copier le lien",
+    "copied": "Lien copié !"
   },
 
   "result": {
@@ -79,6 +93,6 @@
       "label": "Score factuel",
       "value": "{score}/100"
     },
-    "reset": "← Nouvelle affirmation"
+    "reset": "Nouvelle affirmation"
   }
 }
