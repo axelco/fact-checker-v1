@@ -58,6 +58,15 @@
     "newAnalysis": "Nouvelle affirmation"
   },
 
+  "seo": {
+    "home": {
+      "description": "Vérifiez la véracité d'une affirmation en quelques secondes grâce à l'intelligence artificielle et des données factuelles."
+    },
+    "analyses": {
+      "description": "Consultez toutes les analyses de faits générées par nos visiteurs, triées par date ou popularité."
+    }
+  },
+
   "share": {
     "copy":   "Copier le lien",
     "copied": "Lien copié !"

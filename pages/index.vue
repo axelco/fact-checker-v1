@@ -99,6 +99,15 @@ import type { AnalysisResult as AnalysisResultType, ApiAnalyzeResponse } from '~
 
 const { t } = useI18n()
 
+useSeoMeta({
+  title:               t('app.name'),
+  description:         t('seo.home.description'),
+  ogTitle:             t('app.name'),
+  ogDescription:       t('seo.home.description'),
+  twitterTitle:        t('app.name'),
+  twitterDescription:  t('seo.home.description'),
+})
+
 const query       = ref('')
 const loading     = ref(false)
 const result      = ref<AnalysisResultType | null>(null)

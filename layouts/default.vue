@@ -9,3 +9,11 @@
     <AppFooter />
   </div>
 </template>
+
+<script setup lang="ts">
+const url = useRequestURL()
+
+useHead({
+  link: [{ rel: 'canonical', href: url.href }],
+})
+</script>

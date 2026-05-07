@@ -123,6 +123,15 @@ import { POPULAR_THRESHOLD } from '~/utils/constants'
 const { t } = useI18n()
 const route  = useRoute()
 
+useSeoMeta({
+  title:               t('analyses.title'),
+  description:         t('seo.analyses.description'),
+  ogTitle:             t('analyses.title'),
+  ogDescription:       t('seo.analyses.description'),
+  twitterTitle:        t('analyses.title'),
+  twitterDescription:  t('seo.analyses.description'),
+})
+
 const page = ref(parseInt(String(route.query.page ?? '1')))
 const sort = ref<'recent' | 'popular'>(route.query.sort === 'popular' ? 'popular' : 'recent')
 
