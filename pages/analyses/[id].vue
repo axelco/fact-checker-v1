@@ -49,12 +49,16 @@ const { data, pending, error } = await useAsyncData(
   ),
 )
 
-useHead({
-  title: data.value?.affirmation_reformulee ?? 'Analyse',
-  meta: [
-    { name: 'description',    content: data.value?.synthese ?? '' },
-    { property: 'og:title',   content: data.value?.affirmation_reformulee ?? 'Analyse' },
-    { property: 'og:description', content: data.value?.synthese ?? '' },
-  ],
+const title       = data.value?.affirmation_reformulee ?? 'Analyse'
+const description = data.value?.synthese ?? ''
+
+useSeoMeta({
+  title,
+  description,
+  ogTitle:             title,
+  ogDescription:       description,
+  ogType:              'article',
+  twitterTitle:        title,
+  twitterDescription:  description,
 })
 </script>
