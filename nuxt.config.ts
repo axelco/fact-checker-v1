@@ -4,6 +4,24 @@ export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
 
+  app: {
+    head: {
+      htmlAttrs: { lang: 'fr' },
+      titleTemplate: '%s · Vérificateur de faits',
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport',  content: 'width=device-width, initial-scale=1' },
+        { name: 'robots',    content: 'index, follow' },
+        { property: 'og:type',        content: 'website' },
+        { name:     'twitter:card',   content: 'summary' },
+      ],
+    },
+  },
+
+  devServer: {
+    port: 3001,
+  },
+
   modules: ["@nuxtjs/i18n"],
 
   i18n: {

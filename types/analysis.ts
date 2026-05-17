@@ -33,3 +33,8 @@ export interface AnalysisResult {
   ce_que_dit_vraiment_la_data?: string
   sources_consultees?:         string[]
 }
+
+export interface ApiAnalyzeResponse extends AnalysisResult {
+  fromCache: boolean
+  id?:       string
+}

@@ -30,9 +30,9 @@ export async function analyzeQuery(query: string, apiKey: string): Promise<Analy
   let text: string
   try {
     const response = await client.messages.create({
-      model:      'claude-sonnet-4-6',
+      model:      'claude-haiku-4-5-20251001',
       max_tokens: 3000,
-      system:     SYSTEM_PROMPT,
+      system:     [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }] as never,
       tools:      [{ type: 'web_search_20250305', name: 'web_search' }] as never,
       messages:   [{
         role:    'user',

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex flex-col" style="background-color: var(--color-bg-base);">
+  <div class="min-h-screen flex flex-col bg-canvas">
     <AppHeader />
 
     <main class="flex-1 w-full">
@@ -9,3 +9,11 @@
     <AppFooter />
   </div>
 </template>
+
+<script setup lang="ts">
+const url = useRequestURL()
+
+useHead({
+  link: [{ rel: 'canonical', href: url.href }],
+})
+</script>

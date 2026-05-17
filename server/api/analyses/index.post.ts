@@ -1,24 +1,24 @@
-import { analyzeQuery } from '../services/analyzeService'
-import { logger } from '../utils/logger'
+import { analyzeWithCache } from '../../services/analyzeOrchestrator'
+import { logger } from '../../utils/logger'
 
 export default defineEventHandler(async (event) => {
   const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey) {
-    logger.error('Clé API Anthropic manquante', { handler: 'analyze' })
+    logger.error('Clé API Anthropic manquante', { handler: 'analyses' })
     throw createError({ statusCode: 500, message: 'Clé API Anthropic manquante côté serveur' })
   }
 
   const body = await readBody<{ query: string }>(event)
   if (!body?.query?.trim()) {
-    logger.warn('Requête reçue sans affirmation', { handler: 'analyze', body })
+    logger.warn('Requête reçue sans affirmation', { handler: 'analyses', body })
     throw createError({ statusCode: 400, message: 'Affirmation manquante' })
   }
 
   try {
-    return await analyzeQuery(body.query.trim(), apiKey)
+    return await analyzeWithCache(body.query.trim(), apiKey)
   } catch (err) {
     logger.error('Erreur lors de l\'analyse', {
-      handler: 'analyze',
+      handler: 'analyses',
       query:   body.query.trim(),
       error:   err instanceof Error ? err.message : String(err),
     })

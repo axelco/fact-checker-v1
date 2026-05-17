@@ -6,8 +6,22 @@
 
   "header": {
     "nav": {
-      "analyze": "Analyser"
+      "analyze":  "Analyser",
+      "analyses": "Toutes les analyses"
     }
+  },
+
+  "analyses": {
+    "title":  "Toutes les analyses",
+    "total":  "{n} résultat(s)",
+    "empty":      "Aucune analyse trouvée.",
+    "popular":    "Populaire",
+    "see":        "Voir →",
+    "sort": {
+      "recent":   "Plus récentes",
+      "popular":  "Plus populaires"
+    },
+    "pagination": "Page {page} / {total}"
   },
 
   "footer": {
@@ -31,6 +45,31 @@
     "error": {
       "unexpected": "Erreur inattendue"
     }
+  },
+
+  "history": {
+    "title": "Dernières analyses",
+    "score": "{score}/100"
+  },
+
+  "analysis": {
+    "error": "Cette analyse est introuvable ou a expiré.",
+    "backHome": "Retour à l'accueil",
+    "newAnalysis": "Nouvelle affirmation"
+  },
+
+  "seo": {
+    "home": {
+      "description": "Vérifiez la véracité d'une affirmation en quelques secondes grâce à l'intelligence artificielle et des données factuelles."
+    },
+    "analyses": {
+      "description": "Consultez toutes les analyses de faits générées par nos visiteurs, triées par date ou popularité."
+    }
+  },
+
+  "share": {
+    "copy":   "Copier le lien",
+    "copied": "Lien copié !"
   },
 
   "result": {
@@ -63,6 +102,6 @@
       "label": "Score factuel",
       "value": "{score}/100"
     },
-    "reset": "← Nouvelle affirmation"
+    "reset": "Nouvelle affirmation"
   }
 }

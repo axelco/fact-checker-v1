@@ -7,15 +7,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// --- Modèles à venir ---
-
 model Analysis {
-  id          String   @id @default(cuid())
-  query       String
-  verdict     String
-  score       Int
-  result      Json
-  createdAt   DateTime @default(now())
+  id             String   @id @default(cuid())
+  canonicalTopic String   @unique
+  originalQuery  String
+  verdict        String
+  score          Int
+  result         Json
+  hitCount       Int      @default(1)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@map("analyses")
 }
