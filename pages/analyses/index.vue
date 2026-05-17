@@ -135,29 +135,24 @@ useSeoMeta({
 const page = ref(parseInt(String(route.query.page ?? '1')))
 const sort = ref<'recent' | 'popular'>(route.query.sort === 'popular' ? 'popular' : 'recent')
 
-const { data, pending, refresh } = await useAsyncData(
-  () => `analyses-${page.value}-${sort.value}`,
-  () => $fetch<{
-    items:      { id: string; originalQuery: string; verdict: string; score: number; hitCount: number; createdAt: string; updatedAt: string }[]
-    total:      number
-    page:       number
-    totalPages: number
-  }>('/api/analyses', {
-    query: { page: page.value, sort: sort.value },
-  }),
-)
+const { data, pending } = await useFetch<{
+  items:      { id: string; originalQuery: string; verdict: string; score: number; hitCount: number; createdAt: string; updatedAt: string }[]
+  total:      number
+  page:       number
+  totalPages: number
+}>('/api/analyses', {
+  query: { page, sort },
+})
 
 useHead({ title: t('analyses.title') })
 
 function setSort(s: 'recent' | 'popular') {
   sort.value = s
   page.value = 1
-  refresh()
 }
 
 function setPage(p: number) {
   page.value = p
-  refresh()
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
