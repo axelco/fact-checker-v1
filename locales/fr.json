@@ -43,7 +43,8 @@
       "3": "Rédaction du rapport…"
     },
     "error": {
-      "unexpected": "Erreur inattendue"
+      "unexpected":  "Erreur inattendue",
+      "rateLimit":   "Trop de requêtes. Veuillez patienter une minute avant de réessayer."
     }
   },
 

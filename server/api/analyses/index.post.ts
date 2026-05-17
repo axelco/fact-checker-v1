@@ -1,7 +1,16 @@
 import { analyzeWithCache } from '../../services/analyzeOrchestrator'
-import { logger } from '../../utils/logger'
+import { checkRateLimit }   from '../../utils/rateLimiter'
+import { logger }           from '../../utils/logger'
 
 export default defineEventHandler(async (event) => {
+  const ip        = getRequestIP(event, { xForwardedFor: true }) ?? 'unknown'
+  const rateLimit = checkRateLimit(ip)
+  if (!rateLimit.ok) {
+    setResponseHeader(event, 'Retry-After', rateLimit.retryAfter)
+    logger.warn('Rate limit dépassé', { handler: 'analyses', ip })
+    throw createError({ statusCode: 429, message: 'Trop de requêtes. Veuillez réessayer dans quelques instants.' })
+  }
+
   const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey) {
     logger.error('Clé API Anthropic manquante', { handler: 'analyses' })
