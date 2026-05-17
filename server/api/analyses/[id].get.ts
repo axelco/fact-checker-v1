@@ -12,12 +12,12 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, message: 'Analyse introuvable' })
   }
 
-  logger.info('Analysis fetched by ID', { handler: 'analysis/[id]', id })
+  logger.info('Analysis fetched by ID', { handler: 'analyses/[id]', id })
 
   return {
-    id:           record.id,
+    id:            record.id,
     originalQuery: record.originalQuery,
-    createdAt:    record.createdAt,
+    createdAt:     record.createdAt,
     ...(record.result as object),
   }
 })

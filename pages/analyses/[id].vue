@@ -45,7 +45,7 @@ const id    = route.params.id as string
 const { data, pending, error } = await useAsyncData(
   `analysis-${id}`,
   () => $fetch<AnalysisResult & { id: string; originalQuery: string; createdAt: string }>(
-    `/api/analysis/${id}`
+    `/api/analyses/${id}`
   ),
 )
 

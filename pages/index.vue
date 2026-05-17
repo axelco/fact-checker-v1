@@ -152,7 +152,7 @@ async function analyze() {
   error.value   = null
 
   try {
-    const data = await $fetch<ApiAnalyzeResponse>('/api/analyze', {
+    const data = await $fetch<ApiAnalyzeResponse>('/api/analyses', {
       method: 'POST',
       body:   { query: query.value.trim() },
     })
