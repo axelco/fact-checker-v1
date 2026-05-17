@@ -29,11 +29,11 @@ vi.mock("~/server/services/analyzeOrchestrator", () => ({
   analyzeWithCache: mockAnalyzeWithCache,
 }));
 
-import handler from "~/server/api/analyze.post";
+import handler from "~/server/api/analyses/index.post";
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
-describe("POST /api/analyze — validation", () => {
+describe("POST /api/analyses — validation", () => {
   const OLD_ENV = process.env;
 
   beforeEach(() => {
