@@ -112,7 +112,21 @@ server/
 │   └── analysisRepository.ts   # Accès Prisma (save, findById, findPaginated)
 └── utils/
     ├── logger.ts             # Logger Betterstack (fallback console en dev)
-    └── parseJson.ts          # Extraction JSON robuste depuis les réponses LLM
+    ├── parseJson.ts          # Extraction JSON robuste depuis les réponses LLM
+    └── rateLimiter.ts        # Rate limiting par IP (fenêtre glissante en mémoire)
 ```
 
 La clé API Anthropic n'est jamais exposée côté client. Toute communication avec Claude transite par le serveur Nuxt.
+
+## Sécurité API
+
+### Rate limiting
+
+Le endpoint `POST /api/analyses` (seul appel payant vers Claude) est protégé par un rate limiter par IP :
+
+- **5 requêtes max** par fenêtre glissante de **60 secondes**
+- Basé sur une Map en mémoire — adapté à un déploiement single-instance (Railway)
+- Lit l'IP réelle via le header `X-Forwarded-For` (proxy Railway)
+- Retourne un `429` avec le header `Retry-After` (en secondes) en cas de dépassement
+
+> Le rate limiting journalier (quota fonctionnel par IP) est prévu dans une US dédiée et nécessitera une persistance (DB ou Redis).

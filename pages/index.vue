@@ -169,8 +169,14 @@ async function analyze() {
       result:     data,
     })
   } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : t('home.error.unexpected')
-    error.value = msg
+    const status = (e as { status?: number; statusCode?: number })?.status
+                ?? (e as { status?: number; statusCode?: number })?.statusCode
+    if (status === 429) {
+      error.value = t('home.error.rateLimit')
+    } else {
+      error.value = (e as { data?: { message?: string } })?.data?.message
+                 ?? (e instanceof Error ? e.message : t('home.error.unexpected'))
+    }
   } finally {
     loading.value = false
   }
