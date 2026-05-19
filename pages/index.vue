@@ -25,7 +25,8 @@
         v-model="query"
         :rows="3"
         :placeholder="$t('home.input.placeholder')"
-        class="w-full rounded-xl px-4 py-3 text-base resize-none border focus:outline-none transition-colors duration-200 bg-transparent border-line text-primary leading-normal"
+        :disabled="quotaExhausted"
+        class="w-full rounded-xl px-4 py-3 text-base resize-none border focus:outline-none transition-colors duration-200 bg-transparent border-line text-primary leading-normal disabled:opacity-40 disabled:cursor-not-allowed"
         style="font-family: inherit;"
         @keydown.enter.exact.prevent="analyze"
       />
@@ -35,12 +36,52 @@
           {{ $t('home.input.hint') }}
         </span>
         <button
-          :disabled="loading || !query.trim()"
+          :disabled="loading || !query.trim() || quotaExhausted"
           class="btn btn-primary"
           @click="analyze()"
         >
           {{ loading ? $t('home.input.submitting') : $t('home.input.submit') }}
         </button>
+      </div>
+    </div>
+
+    <!-- Quota indicator -->
+    <div v-if="!result && !loading" class="mb-6">
+      <!-- Quota exhausted -->
+      <div
+        v-if="quotaExhausted"
+        class="rounded-xl px-4 py-3 border text-sm bg-amber-950/40 border-amber-800/40 text-amber-400"
+      >
+        ⏳ {{ $t('home.quota.exhausted') }}
+      </div>
+
+      <!-- Quota available -->
+      <div v-else class="flex flex-col gap-1.5">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-mono text-ghost">
+            {{ $t('home.quota.remaining', { remaining: quotaRemaining, total: quotaTotal }) }}
+          </span>
+          <button
+            class="text-xs font-mono text-ghost hover:text-muted transition-colors underline underline-offset-2"
+            @click="showQuotaInfo = !showQuotaInfo"
+          >
+            {{ $t('home.quota.why') }}
+          </button>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="h-0.5 w-full rounded-full bg-line overflow-hidden">
+          <div
+            class="h-full rounded-full transition-all duration-500"
+            :class="quotaRemaining <= 2 ? 'bg-amber-500' : 'bg-accent'"
+            :style="{ width: `${(quotaRemaining / quotaTotal) * 100}%` }"
+          />
+        </div>
+
+        <!-- Explanation (togglable) -->
+        <p v-if="showQuotaInfo" class="text-xs text-ghost mt-1 leading-relaxed">
+          {{ $t('home.quota.whyExplain', { n: quotaTotal }) }}
+        </p>
       </div>
     </div>
 
@@ -77,6 +118,16 @@
       :analyzed-at="analyzedAt"
     />
 
+    <!-- Cache hit badge -->
+    <div
+      v-if="result && lastFromCache && !loading"
+      class="text-center mt-2 mb-1"
+    >
+      <span class="text-xs font-mono text-ghost">
+        ⚡ {{ $t('home.quota.cacheHit') }}
+      </span>
+    </div>
+
     <!-- Action bar -->
     <AnalysisActionBar
       v-if="result && !loading"
@@ -108,17 +159,34 @@ useSeoMeta({
   twitterDescription:  t('seo.home.description'),
 })
 
-const query       = ref('')
-const loading     = ref(false)
-const result      = ref<AnalysisResultType | null>(null)
-const analyzedAt  = ref<string | null>(null)
-const analysisId  = ref<string | null>(null)
-const error       = ref<string | null>(null)
-const loadingStep = ref(0)
-const textareaRef = ref<HTMLTextAreaElement | null>(null)
+const query        = ref('')
+const loading      = ref(false)
+const result       = ref<AnalysisResultType | null>(null)
+const analyzedAt   = ref<string | null>(null)
+const analysisId   = ref<string | null>(null)
+const error        = ref<string | null>(null)
+const loadingStep  = ref(0)
+const textareaRef  = ref<HTMLTextAreaElement | null>(null)
+const lastFromCache = ref(false)
+const showQuotaInfo = ref(false)
+
+// Quota
+const quotaRemaining = ref(10)
+const quotaTotal     = ref(10)
+const quotaExhausted = computed(() => quotaRemaining.value <= 0)
 
 const { history, load: loadHistory, push: pushHistory } = useSearchHistory()
-onMounted(loadHistory)
+
+onMounted(async () => {
+  loadHistory()
+  try {
+    const quota = await $fetch<{ remaining: number; total: number }>('/api/quota')
+    quotaRemaining.value = quota.remaining
+    quotaTotal.value     = quota.total
+  } catch {
+    // En cas d'erreur, on laisse les valeurs par défaut (10/10)
+  }
+})
 
 function stepStyle(i: number) {
   if (i === loadingStep.value) return { color: 'var(--color-muted)' }
@@ -146,7 +214,7 @@ watch(loading, (val) => {
 })
 
 async function analyze() {
-  if (!query.value.trim() || loading.value) return
+  if (!query.value.trim() || loading.value || quotaExhausted.value) return
   loading.value = true
   result.value  = null
   error.value   = null
@@ -156,10 +224,12 @@ async function analyze() {
       method: 'POST',
       body:   { query: query.value.trim() },
     })
-    const now        = new Date().toISOString()
-    result.value     = data
-    analysisId.value = data.id ?? null
-    analyzedAt.value = now
+    const now         = new Date().toISOString()
+    result.value      = data
+    analysisId.value  = data.id ?? null
+    analyzedAt.value  = now
+    lastFromCache.value = data.fromCache
+    quotaRemaining.value = data.quota.remaining
     pushHistory({
       analysisId: data.id,
       query:      query.value.trim(),
@@ -172,7 +242,12 @@ async function analyze() {
     const status = (e as { status?: number; statusCode?: number })?.status
                 ?? (e as { status?: number; statusCode?: number })?.statusCode
     if (status === 429) {
-      error.value = t('home.error.rateLimit')
+      const serverMsg = (e as { data?: { message?: string } })?.data?.message ?? ''
+      // Distinguer quota épuisé (message serveur) du rate limit anti-burst
+      error.value = serverMsg.includes('Quota')
+        ? t('home.error.quotaExceeded', { n: quotaTotal.value })
+        : t('home.error.rateLimit')
+      if (serverMsg.includes('Quota')) quotaRemaining.value = 0
     } else {
       error.value = (e as { data?: { message?: string } })?.data?.message
                  ?? (e instanceof Error ? e.message : t('home.error.unexpected'))
@@ -183,19 +258,21 @@ async function analyze() {
 }
 
 function reset() {
-  result.value     = null
-  analyzedAt.value = null
-  analysisId.value = null
-  error.value      = null
-  query.value      = ''
+  result.value      = null
+  analyzedAt.value  = null
+  analysisId.value  = null
+  error.value       = null
+  query.value       = ''
+  lastFromCache.value = false
   nextTick(() => textareaRef.value?.focus())
 }
 
 function restoreFromHistory(entry: { result: AnalysisResultType; analyzedAt: string; query: string; analysisId?: string }) {
-  result.value     = entry.result
-  analyzedAt.value = entry.analyzedAt
-  analysisId.value = entry.analysisId ?? null
-  query.value      = entry.query
-  error.value      = null
+  result.value      = entry.result
+  analyzedAt.value  = entry.analyzedAt
+  analysisId.value  = entry.analysisId ?? null
+  query.value       = entry.query
+  error.value       = null
+  lastFromCache.value = false
 }
 </script>

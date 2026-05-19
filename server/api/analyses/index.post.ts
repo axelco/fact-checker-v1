@@ -1,6 +1,7 @@
-import { analyzeWithCache } from '../../services/analyzeOrchestrator'
-import { checkRateLimit }   from '../../utils/rateLimiter'
-import { logger }           from '../../utils/logger'
+import { analyzeWithCache }   from '../../services/analyzeOrchestrator'
+import { QuotaExceededError } from '../../services/quotaRepository'
+import { checkRateLimit }     from '../../utils/rateLimiter'
+import { logger }             from '../../utils/logger'
 
 export default defineEventHandler(async (event) => {
   const ip        = getRequestIP(event, { xForwardedFor: true }) ?? 'unknown'
@@ -24,8 +25,12 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    return await analyzeWithCache(body.query.trim(), apiKey)
+    return await analyzeWithCache(body.query.trim(), apiKey, ip)
   } catch (err) {
+    if (err instanceof QuotaExceededError) {
+      logger.warn('Quota journalier atteint', { handler: 'analyses', ip })
+      throw createError({ statusCode: 429, message: err.message })
+    }
     logger.error('Erreur lors de l\'analyse', {
       handler: 'analyses',
       query:   body.query.trim(),

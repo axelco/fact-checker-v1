@@ -44,7 +44,16 @@
     },
     "error": {
       "unexpected":  "Erreur inattendue",
-      "rateLimit":   "Trop de requêtes. Veuillez patienter une minute avant de réessayer."
+      "rateLimit":   "Trop de requêtes. Veuillez patienter une minute avant de réessayer.",
+      "quotaExceeded": "Vous avez atteint la limite de {n} analyses gratuites pour aujourd'hui. Revenez demain !"
+    },
+    "quota": {
+      "remaining":    "{remaining} / {total} analyses disponibles aujourd'hui",
+      "exhausted":    "Limite journalière atteinte — revenez demain",
+      "free":         "Ce service est gratuit",
+      "cacheHit":     "Déjà en base · quota non consommé",
+      "why":          "Pourquoi cette limite ?",
+      "whyExplain":   "L'analyse est propulsée par une IA payante. La limite de {n} requêtes par jour nous permet de maintenir ce service gratuitement."
     }
   },
 
