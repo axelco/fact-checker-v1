@@ -100,16 +100,19 @@ npm run test:coverage   # avec couverture
 ```
 server/
 ├── api/
-│   └── analyses/
-│       ├── index.get.ts      # GET  /api/analyses — liste paginée et triée
-│       ├── index.post.ts     # POST /api/analyses — validation HTTP + délégation
-│       └── [id].get.ts       # GET  /api/analyses/:id — détail d'une analyse
+│   ├── analyses/
+│   │   ├── index.get.ts      # GET  /api/analyses — liste paginée et triée
+│   │   ├── index.post.ts     # POST /api/analyses — validation HTTP + délégation
+│   │   └── [id].get.ts       # GET  /api/analyses/:id — détail d'une analyse
+│   └── quota/
+│       └── index.get.ts      # GET  /api/quota — quota journalier de l'IP courante
 ├── middleware/
 │   └── basic-auth.ts         # Protection HTTP Basic Auth (optionnelle)
 ├── services/
-│   ├── analyzeOrchestrator.ts  # Orchestration : cache DB + appel Claude
+│   ├── analyzeOrchestrator.ts  # Orchestration : cache DB + quota + appel Claude
 │   ├── analyzeService.ts       # Appel Claude (Anthropic SDK) + parsing
-│   └── analysisRepository.ts   # Accès Prisma (save, findById, findPaginated)
+│   ├── analysisRepository.ts   # Accès Prisma analyses (save, findById, findPaginated)
+│   └── quotaRepository.ts      # Accès Prisma quota journalier (check, increment)
 └── utils/
     ├── logger.ts             # Logger Betterstack (fallback console en dev)
     ├── parseJson.ts          # Extraction JSON robuste depuis les réponses LLM
@@ -118,15 +121,24 @@ server/
 
 La clé API Anthropic n'est jamais exposée côté client. Toute communication avec Claude transite par le serveur Nuxt.
 
-## Sécurité API
+## Sécurité & quotas API
 
-### Rate limiting
+### Rate limiting anti-burst (PSP-21)
 
-Le endpoint `POST /api/analyses` (seul appel payant vers Claude) est protégé par un rate limiter par IP :
+Le endpoint `POST /api/analyses` est protégé par un rate limiter par IP :
 
 - **5 requêtes max** par fenêtre glissante de **60 secondes**
 - Basé sur une Map en mémoire — adapté à un déploiement single-instance (Railway)
 - Lit l'IP réelle via le header `X-Forwarded-For` (proxy Railway)
 - Retourne un `429` avec le header `Retry-After` (en secondes) en cas de dépassement
 
-> Le rate limiting journalier (quota fonctionnel par IP) est prévu dans une US dédiée et nécessitera une persistance (DB ou Redis).
+### Quota journalier par IP (PSP-22)
+
+Pour maîtriser les coûts Claude sur un service gratuit, chaque IP est limitée à **10 analyses par jour** :
+
+- Persisté en base PostgreSQL (`daily_quotas`) — survit aux redémarrages
+- Réinitialisation automatique chaque jour (clé composite `ip + date UTC`)
+- Les **analyses servies depuis le cache** ne consomment **pas** de quota (pas d'appel Claude)
+- Le quota restant est affiché en temps réel sur la page d'accueil avec une explication transparente
+- `GET /api/quota` retourne le quota courant de l'IP pour l'affichage au chargement de page
+- Retourne un `429` avec le message `QuotaExceededError` lorsque la limite est atteinte

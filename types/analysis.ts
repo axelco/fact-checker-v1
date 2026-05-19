@@ -34,7 +34,14 @@ export interface AnalysisResult {
   sources_consultees?:         string[]
 }
 
+export interface QuotaInfo {
+  remaining: number  // requêtes restantes pour aujourd'hui
+  total:     number  // limite journalière (toujours 10)
+  consumed:  boolean // true si cette requête a consommé du quota
+}
+
 export interface ApiAnalyzeResponse extends AnalysisResult {
   fromCache: boolean
   id?:       string
+  quota:     QuotaInfo
 }
