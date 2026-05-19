@@ -4,9 +4,11 @@ export default defineEventHandler((event) => {
   // Désactivé si la variable n'est pas explicitement à 'true'
   if (process.env.BASIC_AUTH_ENABLED !== 'true') return
 
-  // Les assets compilés Nuxt n'ont pas besoin d'être protégés
   const url = getRequestURL(event)
-  if (url.pathname.startsWith('/_nuxt/')) return
+
+  // Les assets compilés et les appels API internes (SSR $fetch) sont exemptés.
+  // Sans cette exemption, useAsyncData en SSR échoue faute de credentials.
+  if (url.pathname.startsWith('/_nuxt/') || url.pathname.startsWith('/api/')) return
 
   // Sécurité : si l'auth est activée mais les credentials manquent, on bloque tout
   if (!process.env.BASIC_AUTH_USER || !process.env.BASIC_AUTH_PASS) {
