@@ -19,7 +19,7 @@
           class="inline-block text-xs font-semibold tracking-widest uppercase font-mono rounded px-3 py-0.5 mb-3 border"
           :style="{ color: verdict.color, background: `${verdict.color}22`, borderColor: `${verdict.color}55` }"
         >
-          {{ verdict.label }}
+          {{ $t(`verdict.labels.${props.result.verdict}`) }}
         </span>
         <h2 class="text-lg font-light italic leading-relaxed m-0 text-primary">
           « {{ result.affirmation_reformulee }} »

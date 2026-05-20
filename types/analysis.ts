@@ -1,17 +1,16 @@
 export type VerdictKey = 'VERIFIE' | 'NUANCE' | 'INCERTAIN' | 'TROMPEUSE' | 'FAUX'
 
 export interface VerdictMeta {
-  label: string
   color: string
   glow:  string
 }
 
 export const VERDICTS: Record<VerdictKey, VerdictMeta> = {
-  VERIFIE:   { label: 'Vérifié',               color: '#22c55e', glow: '#22c55e33' },
-  NUANCE:    { label: 'Nuancé',                color: '#84cc16', glow: '#84cc1633' },
-  INCERTAIN: { label: 'Incertain',             color: '#f59e0b', glow: '#f59e0b33' },
-  TROMPEUSE: { label: 'Affirmation trompeuse', color: '#f97316', glow: '#f9731633' },
-  FAUX:      { label: 'Faux',                  color: '#ef4444', glow: '#ef444433' },
+  VERIFIE:   { color: '#22c55e', glow: '#22c55e33' },
+  NUANCE:    { color: '#84cc16', glow: '#84cc1633' },
+  INCERTAIN: { color: '#f59e0b', glow: '#f59e0b33' },
+  TROMPEUSE: { color: '#f97316', glow: '#f9731633' },
+  FAUX:      { color: '#ef4444', glow: '#ef444433' },
 }
 
 export interface PointCle {
