@@ -108,11 +108,13 @@ server/
 │       └── index.get.ts      # GET  /api/quota — quota journalier de l'IP courante
 ├── middleware/
 │   └── basic-auth.ts         # Protection HTTP Basic Auth (optionnelle)
+├── repositories/
+│   ├── analysis.repository.ts  # Accès Prisma analyses (save, findById, findPaginated)
+│   └── quota.repository.ts     # Accès Prisma quota journalier (check, increment)
 ├── services/
-│   ├── analyzeOrchestrator.ts  # Orchestration : cache DB + quota + appel Claude
-│   ├── analyzeService.ts       # Appel Claude (Anthropic SDK) + parsing
-│   ├── analysisRepository.ts   # Accès Prisma analyses (save, findById, findPaginated)
-│   └── quotaRepository.ts      # Accès Prisma quota journalier (check, increment)
+│   ├── analysis.orchestrator.ts # Orchestration : cache DB + quota + appel Claude
+│   ├── analysis.service.ts      # Appel Claude (Anthropic SDK) + parsing
+│   └── canonical.service.ts     # Normalisation de la query via Claude
 └── utils/
     ├── logger.ts             # Logger Betterstack (fallback console en dev)
     ├── parseJson.ts          # Extraction JSON robuste depuis les réponses LLM

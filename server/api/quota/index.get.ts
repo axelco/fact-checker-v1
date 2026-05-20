@@ -1,4 +1,4 @@
-import { getQuotaRemaining, DAILY_LIMIT } from '../../services/quotaRepository'
+import { getQuotaRemaining, DAILY_LIMIT } from '../../repositories/quota.repository'
 
 export default defineEventHandler(async (event) => {
   const ip = getRequestIP(event, { xForwardedFor: true }) ?? 'unknown'
