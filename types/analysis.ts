@@ -1,4 +1,4 @@
-export type VerdictKey = 'VERIFIE' | 'NUANCE' | 'INCERTAIN' | 'TROMPEUSE' | 'FAUX'
+export type VerdictKey = 'VERIFIE' | 'NUANCE' | 'INCERTAIN' | 'TROMPEUR' | 'FAUX'
 
 export interface VerdictMeta {
   color: string
@@ -9,7 +9,7 @@ export const VERDICTS: Record<VerdictKey, VerdictMeta> = {
   VERIFIE:   { color: '#22c55e', glow: '#22c55e33' },
   NUANCE:    { color: '#84cc16', glow: '#84cc1633' },
   INCERTAIN: { color: '#f59e0b', glow: '#f59e0b33' },
-  TROMPEUSE: { color: '#f97316', glow: '#f9731633' },
+  TROMPEUR:  { color: '#f97316', glow: '#f9731633' },
   FAUX:      { color: '#ef4444', glow: '#ef444433' },
 }
 

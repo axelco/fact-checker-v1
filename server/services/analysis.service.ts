@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { parseJson } from '../utils/parseJson'
+import { scoreToVerdict } from '../utils/scoreToVerdict'
 import { logger } from '../utils/logger'
 import type { AnalysisResult } from '~/types/analysis'
 
@@ -11,7 +12,6 @@ L'utilisateur soumet une affirmation. Tu dois :
 4. Retourner UNIQUEMENT un JSON valide sans markdown :
 {
   "affirmation_reformulee": "Reformulation neutre",
-  "verdict": "NUANCE",
   "score": 45,
   "synthese": "3-4 phrases résumant la réalité factuelle",
   "points_cles": [
@@ -22,7 +22,7 @@ L'utilisateur soumet une affirmation. Tu dois :
   "ce_que_dit_vraiment_la_data": "Conclusion honnête",
   "sources_consultees": ["INSEE 2023", "Eurostat 2022"]
 }
-Verdicts : VERIFIE, NUANCE, INCERTAIN, TROMPEUSE, FAUX. Score 0-100. Max 4 points_cles.`
+Score de 0 à 100 (fiabilité factuelle). Max 4 points_cles.`
 
 export async function analyzeQuery(query: string, apiKey: string): Promise<AnalysisResult> {
   const client = new Anthropic({ apiKey })
@@ -54,7 +54,8 @@ export async function analyzeQuery(query: string, apiKey: string): Promise<Analy
   }
 
   try {
-    return parseJson(text) as AnalysisResult
+    const raw = parseJson(text) as Omit<AnalysisResult, 'verdict'>
+    return { ...raw, verdict: scoreToVerdict(raw.score) }
   } catch (err) {
     logger.error('Échec du parsing JSON de la réponse Anthropic', {
       service:  'analyzeService',

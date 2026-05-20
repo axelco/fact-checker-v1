@@ -14,9 +14,8 @@ export async function saveAnalysis(
     data: {
       canonicalTopic,
       originalQuery,
-      verdict: result.verdict,
-      score:   result.score,
-      result:  result as object,
+      score:  result.score,
+      result: result as object,
     },
   })
 }
@@ -33,33 +32,29 @@ export async function findById(id: string) {
 }
 
 export async function findPaginated(opts: {
-  page:     number
-  limit:    number
-  sort:     'recent' | 'popular'
-  verdict?: string
+  page:  number
+  limit: number
+  sort:  'recent' | 'popular'
 }) {
-  const where    = opts.verdict ? { verdict: opts.verdict } : {}
-  const orderBy  = opts.sort === 'popular'
+  const orderBy = opts.sort === 'popular'
     ? { hitCount: 'desc' as const }
     : { updatedAt: 'desc' as const }
 
   const [items, total] = await Promise.all([
     prisma.analysis.findMany({
-      where,
       orderBy,
       skip:   (opts.page - 1) * opts.limit,
       take:   opts.limit,
       select: {
         id:            true,
         originalQuery: true,
-        verdict:       true,
         score:         true,
         hitCount:      true,
         createdAt:     true,
         updatedAt:     true,
       },
     }),
-    prisma.analysis.count({ where }),
+    prisma.analysis.count(),
   ])
 
   return { items, total, page: opts.page, totalPages: Math.ceil(total / opts.limit) }

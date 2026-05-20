@@ -21,9 +21,9 @@ import { analyzeQuery } from "~/server/services/analysis.service";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+// Claude ne retourne plus le champ verdict — l'app le calcule depuis le score
 const VALID_RESULT = {
   affirmation_reformulee: "Test reformulé",
-  verdict:  "NUANCE",
   score:    55,
   synthese: "Synthèse factuelle.",
   points_cles: [{ categorie: "Données", fait: "Un fait", source: "INSEE 2023" }],
@@ -72,9 +72,10 @@ describe("analyzeQuery", () => {
   });
 
   describe("traitement de la réponse", () => {
-    it("retourne le résultat parsé correctement", async () => {
+    it("retourne le résultat avec le verdict calculé depuis le score", async () => {
       mockAnthropicText(VALID_RESULT);
       const result = await analyzeQuery("Test", "sk-ant-test");
+      // score 55 → NUANCE (51–79)
       expect(result).toMatchObject({ verdict: "NUANCE", score: 55 });
     });
 
@@ -82,11 +83,12 @@ describe("analyzeQuery", () => {
       mockCreate.mockResolvedValueOnce({
         content: [
           { type: "tool_use", id: "x", name: "web_search", input: {} },
-          { type: "text", text: '{"verdict":"VERIFIE","score":90,' },
+          { type: "text", text: '{"score":90,' },
           { type: "text", text: '"synthese":"OK","points_cles":[],"affirmation_reformulee":"R"}' },
         ],
       });
       const result = await analyzeQuery("Test", "sk-ant-test");
+      // score 90 → VERIFIE (80–100)
       expect(result.verdict).toBe("VERIFIE");
       expect(result.score).toBe(90);
     });
@@ -96,6 +98,7 @@ describe("analyzeQuery", () => {
         content: [{ type: "text", text: `Voici le résultat : ${JSON.stringify(VALID_RESULT)} fin.` }],
       });
       const result = await analyzeQuery("Test", "sk-ant-test");
+      // score 55 → NUANCE (51–79)
       expect(result.verdict).toBe("NUANCE");
     });
   });
