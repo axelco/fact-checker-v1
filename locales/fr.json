@@ -4,6 +4,16 @@
     "tagline": "Saisissez une affirmation · Les données parlent d'elles-mêmes"
   },
 
+  "verdict": {
+    "labels": {
+      "VERIFIE":   "Vérifié",
+      "NUANCE":    "Nuancé",
+      "INCERTAIN": "Incertain",
+      "TROMPEUSE": "Trompeur",
+      "FAUX":      "Faux"
+    }
+  },
+
   "header": {
     "nav": {
       "analyze":  "Analyser",

@@ -41,6 +41,7 @@
 import { VERDICTS } from '~/types/analysis'
 import type { HistoryEntry } from '~/composables/useSearchHistory'
 
+
 const { t } = useI18n()
 
 defineProps<{ entries: HistoryEntry[] }>()
@@ -56,8 +57,7 @@ function verdictStyle(verdictKey: string) {
 }
 
 function verdictLabel(verdictKey: string) {
-  const v = VERDICTS[verdictKey as keyof typeof VERDICTS] ?? VERDICTS.INCERTAIN
-  return v.label
+  return t(`verdict.labels.${verdictKey}`)
 }
 
 function timeAgo(iso: string) {

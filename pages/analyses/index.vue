@@ -162,7 +162,7 @@ function verdictBadgeStyle(key: string) {
 }
 
 function verdictLabel(key: string) {
-  return (VERDICTS[key as keyof typeof VERDICTS] ?? VERDICTS.INCERTAIN).label
+  return t(`verdict.labels.${key}`)
 }
 
 function timeAgo(iso: string) {
