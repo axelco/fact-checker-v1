@@ -1,4 +1,4 @@
-import { findById } from '../../services/analysisRepository'
+import { findById } from '../../repositories/analysis.repository'
 import { logger } from '../../utils/logger'
 
 export default defineEventHandler(async (event) => {

@@ -1,7 +1,7 @@
-import { analyzeQuery } from './analyzeService'
-import { getCanonicalTopic } from './canonicalService'
-import { findByCanonicalTopic, saveAnalysis, incrementHitCount } from './analysisRepository'
-import { checkAndIncrementQuota, getQuotaRemaining, DAILY_LIMIT } from './quotaRepository'
+import { analyzeQuery } from './analysis.service'
+import { getCanonicalTopic } from './canonical.service'
+import { findByCanonicalTopic, saveAnalysis, incrementHitCount } from '../repositories/analysis.repository'
+import { checkAndIncrementQuota, getQuotaRemaining, DAILY_LIMIT } from '../repositories/quota.repository'
 import { logger } from '../utils/logger'
 import type { ApiAnalyzeResponse } from '~/types/analysis'
 

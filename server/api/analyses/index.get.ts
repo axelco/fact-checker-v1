@@ -1,4 +1,4 @@
-import { findPaginated } from '../../services/analysisRepository'
+import { findPaginated } from '../../repositories/analysis.repository'
 import { logger } from '../../utils/logger'
 
 const VALID_VERDICTS = ['VERIFIE', 'NUANCE', 'INCERTAIN', 'TROMPEUSE', 'FAUX']

@@ -17,7 +17,7 @@ vi.mock("@anthropic-ai/sdk", () => ({
   }),
 }));
 
-import { analyzeQuery } from "~/server/services/analyzeService";
+import { analyzeQuery } from "~/server/services/analysis.service";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -47,7 +47,7 @@ describe("analyzeQuery", () => {
       mockAnthropicText(VALID_RESULT);
       await analyzeQuery("Test", "sk-ant-test");
       expect(mockCreate).toHaveBeenCalledWith(
-        expect.objectContaining({ model: "claude-sonnet-4-6" })
+        expect.objectContaining({ model: "claude-haiku-4-5-20251001" })
       );
     });
 

@@ -1,5 +1,5 @@
-import { analyzeWithCache }   from '../../services/analyzeOrchestrator'
-import { QuotaExceededError } from '../../services/quotaRepository'
+import { analyzeWithCache }   from '../../services/analysis.orchestrator'
+import { QuotaExceededError } from '../../repositories/quota.repository'
 import { checkRateLimit }     from '../../utils/rateLimiter'
 import { logger }             from '../../utils/logger'
 

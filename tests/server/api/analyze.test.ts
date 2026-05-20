@@ -29,7 +29,7 @@ vi.mock("~/server/utils/logger", () => ({
   logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() },
 }));
 
-vi.mock("~/server/services/analyzeOrchestrator", () => ({
+vi.mock("~/server/services/analysis.orchestrator", () => ({
   analyzeWithCache: mockAnalyzeWithCache,
 }));
 
@@ -37,7 +37,7 @@ vi.mock("~/server/utils/rateLimiter", () => ({
   checkRateLimit: mockCheckRateLimit,
 }));
 
-vi.mock("~/server/services/quotaRepository", () => ({
+vi.mock("~/server/repositories/quota.repository", () => ({
   QuotaExceededError: class QuotaExceededError extends Error {
     statusCode = 429;
     constructor() { super("Quota journalier atteint. Revenez demain !"); }
